@@ -29,8 +29,6 @@ optparse = OptionParser.new do |opts|
 
   FORCE = false
   opts.on("-f", "--force", "Overwrite existing records") { FORCE = true }
-  DEFAULT_GROUP = ""
-  opts.on("-d", "--default GROUP", "Place uncategorised records into GROUP") { |group| DEFAULT_GROUP = group }
   opts.on("-h", "--help", "Display this screen") { puts opts; exit }
 
   opts.parse!
@@ -90,7 +88,6 @@ rows.each do |args|
   password = args.shift
   fav = args.pop
   grouping = args.pop
-  grouping = DEFAULT_GROUP if grouping == nil
   name = args.pop
   extra = args.join(",")
 
