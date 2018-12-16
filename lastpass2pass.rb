@@ -46,8 +46,8 @@ puts "Reading '#{filename}'..."
 
 
 class Record
-  def initialize name, url, username, password, extra, grouping, fav
-    @name, @url, @username, @password, @extra, @grouping, @fav = name, url, username, password, extra, grouping, fav
+  def initialize name, url, username, password, extra
+    @name, @url, @username, @password, @extra = name, url, username, password, extra
   end
 
   def name
@@ -86,12 +86,12 @@ rows.each do |args|
   url = args.shift
   username = args.shift
   password = args.shift
-  fav = args.pop
-  grouping = args.pop
+  args.pop # Ignore “fav”
+  args.pop # Ignore “grouping”
   name = args.pop
   extra = args.join(",")
 
-  records << Record.new(name, url, username, password, extra, grouping, fav)
+  records << Record.new(name, url, username, password, extra)
 end
 puts "Records parsed: #{records.length}"
 
