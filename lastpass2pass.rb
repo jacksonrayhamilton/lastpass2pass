@@ -107,12 +107,15 @@ puts "Records parsed: #{records.length}"
 successful = 0
 errors = []
 records.each do |r|
-  if File.exist?("#{r.name}.gpg") && FORCE == false
-    puts "Skipped “#{r.name}”: Already exists."
-    next
+  name = r.name
+  copy = 1
+  while File.exist?("#{name}.gpg")
+    break if FORCE
+    copy += 1
+    name = "#{r.name} (#{copy})"
   end
-  print "Creating record “#{r.name}”..."
-  IO.popen("pass insert -m '#{r.name}' > /dev/null", 'w') do |io|
+  print "Creating record “#{name}”..."
+  IO.popen("pass insert -m '#{name}' > /dev/null", 'w') do |io|
     io.puts r
   end
   if $CHILD_STATUS == 0
