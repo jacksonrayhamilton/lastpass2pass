@@ -20,8 +20,10 @@
 #
 #$ ./lastpass2pass.rb path/to/passwords_file.csv
 
-# Parse flags
+require 'csv'
 require 'optparse'
+
+# Parse flags
 optparse = OptionParser.new do |opts|
   opts.banner = "Usage: #{$0} [options] filename"
 
@@ -52,48 +54,37 @@ class Record
 
   def name
     s = ""
-    s << @grouping + "/" unless @grouping.empty?
+    s << "Secure Notes/" if secure_note?
     s << @name unless @name == nil
-    s.gsub(/ /, "_").gsub(/'/, "")
+    s.gsub(/'/, "")
   end
 
   def to_s
     s = ""
-    s << "#{@password}\n---\n"
-    s << "#{@grouping} / " unless @grouping.empty?
-    s << "#{@name}\n"
-    s << "username: #{@username}\n" unless @username.empty?
-    s << "password: #{@password}\n" unless @password.empty?
-    s << "url: #{@url}\n" unless @url == "http://sn"
+    s << "#{@password}\n"
+    s << "username: #{@username}\n" unless @username.nil? || @username.empty?
+    s << "url: #{@url}\n" unless secure_note?
     s << "#{@extra}\n" unless @extra.nil?
     return s
   end
+
+  private
+
+  def secure_note?
+    @url == "http://sn"
+  end
 end
 
-# Extract individual records
-entries = []
-entry = ""
-begin
-  file = File.open(filename)
-  file.each do |line|
-    if line =~ /^(http|ftp|ssh)/
-      entries.push(entry)
-      entry = ""
-    end
-    entry += line
-  end
-  entries.push(entry)
-  entries.shift
-  puts "#{entries.length} records found!"
-rescue
+unless File.exist?(filename)
   puts "Couldn't find #{filename}!"
   exit 1
 end
 
 # Parse records and create Record objects
 records = []
-entries.each do |e|
-  args = e.split(",")
+rows = CSV.read(filename)
+rows.shift
+rows.each do |args|
   url = args.shift
   username = args.shift
   password = args.shift
@@ -101,7 +92,7 @@ entries.each do |e|
   grouping = args.pop
   grouping = DEFAULT_GROUP if grouping == nil
   name = args.pop
-  extra = args.join(",")[1...-1]
+  extra = args.join(",")
 
   records << Record.new(name, url, username, password, extra, grouping, fav)
 end
