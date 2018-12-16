@@ -109,7 +109,7 @@ errors = []
 records.each do |r|
   name = r.name
   copy = 1
-  while File.exist?("#{name}.gpg")
+  while File.exist?("#{Dir.home}/.password-store/#{name}.gpg")
     break if FORCE
     copy += 1
     name = "#{r.name} (#{copy})"
