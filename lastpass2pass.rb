@@ -63,7 +63,7 @@ class Record
     s = ''
     s << 'Secure Notes/' if secure_note?
     s << @name unless @name.nil?
-    s.delete("'")
+    s.gsub(/["']/, '')
   end
 
   def to_s
